@@ -1,0 +1,62 @@
+// =====================================================================
+// Model Vehicle Sales (Classic Models): DAX measures to ADD in Power BI Desktop
+// Basis: NET = cancelled orders excluded (confirmed by owner).
+// Existing measures to retire only after verification: sales_03, sales_04,
+// Profit Margin (%), MostOrderedProduct (keep, retitle), and the card/KPI
+// visuals that point at them.
+// First check: after loading, [Gross Sales] must equal 9,604,190.61.
+// Assumed columns: 'order details'[Sales], [quantityOrdered], [priceEach];
+// orders[status], [orderDate], [orderNumber]; products[buyPrice].
+// =====================================================================
+
+// ---------- Basis ----------
+Gross Sales =
+SUM ( 'order details'[Sales] )
+
+Net Sales =
+CALCULATE ( [Gross Sales], orders[status] <> "Cancelled" )
+
+Cancelled Sales =
+CALCULATE ( [Gross Sales], orders[status] = "Cancelled" )
+
+// ---------- Volume ----------
+Net Orders =
+CALCULATE ( DISTINCTCOUNT ( orders[orderNumber] ), orders[status] <> "Cancelled" )
+
+Units Sold =
+CALCULATE ( SUM ( 'order details'[quantityOrdered] ), orders[status] <> "Cancelled" )
+
+Avg Order Value =
+DIVIDE ( [Net Sales], [Net Orders] )
+
+// ---------- Profit ----------
+Gross Profit =
+CALCULATE (
+    SUMX (
+        'order details',
+        'order details'[quantityOrdered] * ( 'order details'[priceEach] - RELATED ( products[buyPrice] ) )
+    ),
+    orders[status] <> "Cancelled"
+)
+
+Gross Profit Margin % =
+DIVIDE ( [Gross Profit], [Net Sales] )
+
+// ---------- Year comparisons (fixed years, ignore 2005 partial year) ----------
+Net Sales 2003 =
+CALCULATE ( [Net Sales], FILTER ( ALL ( orders[orderDate] ), YEAR ( orders[orderDate] ) = 2003 ) )
+
+Net Sales 2004 =
+CALCULATE ( [Net Sales], FILTER ( ALL ( orders[orderDate] ), YEAR ( orders[orderDate] ) = 2004 ) )
+
+Net Sales 2004 vs 2003 % =
+DIVIDE ( [Net Sales 2004] - [Net Sales 2003], [Net Sales 2003] )
+
+// Headline for full years only (2003 and 2004). Use this instead of total net sales
+// on any card that sits next to the partial 2005 year.
+Net Sales Full Years =
+CALCULATE ( [Net Sales], FILTER ( ALL ( orders[orderDate] ), YEAR ( orders[orderDate] ) <= 2004 ) )
+
+// ---------- Data currency note (for the subtitle) ----------
+Data Through =
+"Data through " & FORMAT ( MAX ( orders[orderDate] ), "d mmm yyyy" )
