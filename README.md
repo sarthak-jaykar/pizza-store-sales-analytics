@@ -1,8 +1,10 @@
 # Pizza Store Sales Performance Analytics
 
 ![Power BI](https://img.shields.io/badge/Power%20BI-Dashboard-F2C811?logo=powerbi&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?logo=pandas&logoColor=white)
 ![Domain](https://img.shields.io/badge/Domain-MKT-success)
-![Data Model](https://img.shields.io/badge/Data%20Model-Relational-blue)
+![Data Model](https://img.shields.io/badge/Data%20Model-Single%20Table-blue)
 
 [![Sales Overview](screenshots/01_sales_overview.png)](screenshots/01_sales_overview.png)
 
